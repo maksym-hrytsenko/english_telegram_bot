@@ -160,7 +160,20 @@ def back_button_menu():
 # Обробка кнопки "Все добре"
 @bot.message_handler(func=lambda message: message.text == "✅ Все добре")
 def confirm_words(message):
-    bot.send_message(message.chat.id, "✅ Список затверджено. Повертаємося в головне меню.", reply_markup=main_menu())
+    # Отримуємо поточний список слів, що були обрані
+    selected_words = bot.selected_words
+    
+    # Завантажуємо всі слова з бази
+    words = load_words()
+
+    # Видаляємо 20 слів, що знаходяться в поточному списку
+    words_to_remove = [word for word in words if word in selected_words]
+    updated_words = [word for word in words if word not in words_to_remove]
+    
+    # Оновлюємо базу даних без цих 20 слів
+    update_words(updated_words)
+
+    bot.send_message(message.chat.id, "✅ Список затверджено. Вибрані слова видалено з бази. Повертаємося в головне меню.", reply_markup=main_menu())
 
 # Обробка кнопки "Повернутися назад"
 @bot.message_handler(func=lambda message: message.text == "↩️ Повернутися назад")

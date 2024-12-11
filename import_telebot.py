@@ -3,7 +3,7 @@ import telebot
 import re
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from deep_translator import GoogleTranslator
-WORD_FILE_PATH = r"D:\Телеграм бот\unlearned_words.txt"
+WORD_FILE_PATH = r"unlearned_words.txt"
 
 # Функція перекладу слова
 def translate_word(word):

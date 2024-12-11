@@ -116,6 +116,7 @@ def edit_menu(selected_words):
 
 # Обробка кнопки "Змінити список слів"
 @bot.message_handler(func=lambda message: message.text == "✏️ Змінити список слів")
+@bot.message_handler(func=lambda message: message.text == "✏️ Змінити список слів")
 def change_words_prompt(message):
     bot.send_message(message.chat.id, "Введіть номери слів для заміни через пробіл:", reply_markup=back_button_menu())
     bot.register_next_step_handler(message, change_words)
@@ -126,21 +127,31 @@ def change_words(message):
         return
 
     try:
+        # Обробка введених номерів слів для заміни
         indices = list(map(int, message.text.split()))
-        indices = [i - 1 for i in indices if 0 < i <= len(bot.selected_words)]
-        words = load_words()
+        indices = [i - 1 for i in indices if 0 < i <= len(bot.selected_words)]  # Перетворення на індекси
 
-        # Видаляємо обрані слова
+        words = load_words()  # Завантажуємо всі слова з бази даних
+
+        # Видаляємо слова з бази, що будуть замінені
+        words_to_remove = [bot.selected_words[i] for i in indices]
+        updated_words = [word for word in words if word not in words_to_remove]
+
+        # Оновлюємо базу даних
+        update_words(updated_words)
+
+        # Генеруємо нові слова для заміни
+        new_selected_words = random.sample(updated_words, min(20, len(updated_words)))
+
+        # Оновлюємо поточний список вибраних слів
         for i in indices:
-            word_to_remove = bot.selected_words[i]
-            words.remove(word_to_remove)
+            new_word = random.choice(updated_words)
+            bot.selected_words[i] = new_word  # Замінюємо обрані слова на нові
 
-        update_words(words)
+        # Виводимо новий список
+        numbered_list = "\n".join([f"{i + 1}. {word}" for i, word in enumerate(bot.selected_words)])
+        bot.send_message(message.chat.id, f"🔄 Оновлений список слів:\n{numbered_list}", reply_markup=edit_menu(bot.selected_words))
 
-        # Оновлюємо список
-        new_selected_words = random.sample(words, min(20, len(words)))
-        numbered_list = "\n".join([f"{i + 1}. {word}" for i, word in enumerate(new_selected_words)])
-        bot.send_message(message.chat.id, f"🔄 Оновлено список слів:\n{numbered_list}", reply_markup=edit_menu(new_selected_words))
     except Exception as e:
         bot.send_message(message.chat.id, f"❌ Помилка: {e}. Спробуйте ще раз.", reply_markup=back_button_menu())
 

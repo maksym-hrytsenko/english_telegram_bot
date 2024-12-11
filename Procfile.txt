@@ -1,1 +1,1 @@
-web: python import_telebot.py
+worker: python import_telebot.py

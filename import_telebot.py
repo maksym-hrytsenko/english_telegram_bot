@@ -3,7 +3,32 @@ import telebot
 import re
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from deep_translator import GoogleTranslator
+from github import Github
 WORD_FILE_PATH = r"unlearned_words.txt"
+
+GITHUB_TOKEN = "b762dd84da576823223b389c8a884fae1619ce90"  # Замість "ваш_токен" вставте реальний токен
+REPO_NAME = "MaKsYmKa28/english_telegram_bot"  # Наприклад: "username/my-bot-repo"
+FILE_PATH = "https://raw.githubusercontent.com/MaKsYmKa28/english_telegram_bot/refs/heads/main/unlearned_words.txt?token=GHSAT0AAAAAAC3ZIWXKAGDVT5GK4HZ2XODYZ3ADDKA"  # Шлях до вашого файлу у репозиторії
+
+# Ініціалізація клієнта GitHub
+github = Github(GITHUB_TOKEN)
+repo = github.get_repo(REPO_NAME)
+
+def update_github_file(content, commit_message="Update words"):
+    try:
+        # Отримуємо поточний файл з репозиторію
+        file = repo.get_contents(FILE_PATH)
+        
+        # Оновлюємо файл у репозиторії
+        repo.update_file(
+            path=FILE_PATH,
+            message=commit_message,
+            content=content,
+            sha=file.sha
+        )
+        print("Файл успішно оновлено на GitHub.")
+    except Exception as e:
+        print(f"Помилка при оновленні файлу на GitHub: {e}")
 
 # Функція перекладу слова
 def translate_word(word):
@@ -24,11 +49,25 @@ def load_words():
 def save_word(word_pair):
     with open(WORD_FILE_PATH, "a", encoding="utf-8") as file:
         file.write(word_pair + "\n")
+    
+    # Читаємо оновлений вміст файлу
+    with open(WORD_FILE_PATH, "r", encoding="utf-8") as file:
+        content = file.read()
+    
+    # Оновлюємо файл на GitHub
+    update_github_file(content, commit_message=f"Додано слово: {word_pair}")
 
 # Оновлення списку слів
 def update_words(words):
     with open(WORD_FILE_PATH, "w", encoding="utf-8") as file:
         file.writelines(word + "\n" for word in words)
+    
+    # Читаємо оновлений вміст файлу
+    with open(WORD_FILE_PATH, "r", encoding="utf-8") as file:
+        content = file.read()
+    
+    # Оновлюємо файл на GitHub
+    update_github_file(content, commit_message="Оновлено список слів")
 
 # Головне меню
 def main_menu():

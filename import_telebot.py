@@ -6,7 +6,7 @@ from deep_translator import GoogleTranslator
 from github import Github
 WORD_FILE_PATH = r"unlearned_words.txt"
 
-GITHUB_TOKEN = "b762dd84da576823223b389c8a884fae1619ce90"  # Замість "ваш_токен" вставте реальний токен
+GITHUB_TOKEN = "8debfd6fc5280c9d4aed1f1b9260d3081820f332"  # Замість "ваш_токен" вставте реальний токен
 REPO_NAME = "MaKsYmKa28/english_telegram_bot"  # Наприклад: "username/my-bot-repo"
 FILE_PATH = "https://raw.githubusercontent.com/MaKsYmKa28/english_telegram_bot/refs/heads/main/unlearned_words.txt?token=GHSAT0AAAAAAC3ZIWXKAGDVT5GK4HZ2XODYZ3ADDKA"  # Шлях до вашого файлу у репозиторії
 

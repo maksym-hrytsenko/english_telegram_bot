@@ -1,8 +1,10 @@
+beautifulsoup4==4.12.3
 certifi==2024.12.14
-charset-normalizer==3.4.0
+charset-normalizer==3.4.1
+deep-translator==1.11.4
 idna==3.10
-mysql-connector-python==9.1.0
-pyTelegramBotAPI==4.25.0
+mysql-connector-python==9.2.0
+pyTelegramBotAPI==4.26.0
 requests==2.32.3
-telebot==0.0.5
-urllib3==2.2.3
+soupsieve==2.6
+urllib3==2.3.0

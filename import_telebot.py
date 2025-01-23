@@ -1,9 +1,9 @@
 import random
-import telebot
-import mysql.connector
-from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+import telebot # type: ignore
+import mysql.connector # type: ignore
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton # type: ignore
 import re
-from deep_translator import GoogleTranslator
+from deep_translator import GoogleTranslator # type: ignore
 
 # Підключення до бази даних MySQL
 def get_db_connection():
@@ -53,11 +53,13 @@ def delete_words_from_db(words_to_delete):
         for word in words_to_delete:
             word_to_remove = word.split(" -> ")[0]  # Отримуємо тільки слово (без перекладу)
             cursor.execute("DELETE FROM words WHERE word = %s", (word_to_remove,))
+            cursor.execute("INSERT INTO deleted_words (deleted_at) VALUES (NOW())")  # Додаємо запис у таблицю видалених слів
         conn.commit()
         cursor.close()
         conn.close()
     except mysql.connector.Error as err:
         print(f"Помилка при видаленні слів з бази: {err}")
+
 
 # Головне меню з новою кнопкою
 def main_menu():
@@ -72,9 +74,29 @@ def main_menu():
 # Обробка кнопки "📊 Кількість слів у базі"
 @bot.message_handler(func=lambda message: message.text == "📊 Кількість слів у базі")
 def count_words(message):
-    words = load_words()
-    word_count = len(words)
-    bot.send_message(message.chat.id, f"📊 У базі даних {word_count} слів.", reply_markup=main_menu())
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Отримуємо кількість всіх слів у базі
+        cursor.execute("SELECT COUNT(*) FROM words")
+        word_count = cursor.fetchone()[0]
+
+        # Отримуємо кількість видалених слів
+        cursor.execute("SELECT COUNT(*) FROM deleted_words")
+        deleted_word_count = cursor.fetchone()[0]
+
+        cursor.close()
+        conn.close()
+
+        bot.send_message(
+            message.chat.id,
+            f"📊 У базі даних {word_count} слів.\n📉 Було вивчено {deleted_word_count} слів.",
+            reply_markup=main_menu()
+        )
+    except mysql.connector.Error as err:
+        print(f"Помилка при отриманні кількості слів: {err}")
+        bot.send_message(message.chat.id, "❌ Сталася помилка при отриманні даних.")
 
 # Обробник команди /start
 @bot.message_handler(commands=['start'])

@@ -5,6 +5,7 @@ deep-translator==1.11.4
 idna==3.10
 mysql-connector-python==9.2.0
 pyTelegramBotAPI==4.26.0
+python-dotenv==1.0.1
 requests==2.32.3
 soupsieve==2.6
 urllib3==2.3.0

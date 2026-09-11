@@ -1,17 +1,21 @@
+import os
 import random
 import telebot # type: ignore
 import mysql.connector # type: ignore
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton # type: ignore
 import re
 from deep_translator import GoogleTranslator # type: ignore
+from dotenv import load_dotenv # type: ignore
+
+load_dotenv()
 
 # Підключення до бази даних MySQL
 def get_db_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",  # Вкажіть ваш пароль, якщо він є
-        database="unlearned_words"
+        host=os.environ.get("DB_HOST", "localhost"),
+        user=os.environ.get("DB_USER", "root"),
+        password=os.environ.get("DB_PASSWORD", ""),
+        database=os.environ.get("DB_NAME", "unlearned_words")
     )
 
 # Функція перекладу слова
@@ -19,7 +23,8 @@ def translate_word(word):
     return GoogleTranslator(source='en', target='uk').translate(word)
 
 # Створення об'єкта бота
-bot = telebot.TeleBot('7908612781:AAGrjMOlyzldy8ifgBjlDdxnFZmmSF2ETDQ')
+BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
+bot = telebot.TeleBot(BOT_TOKEN)
 
 def load_words():
     try:
